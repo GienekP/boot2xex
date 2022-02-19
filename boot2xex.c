@@ -6,7 +6,7 @@
 void boot2xex(const char *fni, const char *fno)
 {
 	unsigned int i,fsize;
-	unsigned int start, end;
+	unsigned int start, end, ini;
 	FILE *fi,*fo;
 	fi=fopen(fni,"rb");
 	if (fi)
@@ -26,13 +26,25 @@ void boot2xex(const char *fni, const char *fno)
 			start|=((fgetc(fi)&0xFF)<<8);
 			start+=6;
 			printf("Load adress = $%04X\n",start);
-			fgetc(fi);
-			fgetc(fi);		
+			ini=(fgetc(fi)&0xFF);
+			ini|=((fgetc(fi)&0xFF)<<8);
 			fsize-=6;
 			end=start+fsize-1;
 			printf("End adress = $%04X\n",end);		
 			fputc(0xFF,fo);
 			fputc(0xFF,fo);
+			fputc((start&0xFF),fo);
+			fputc(((start>>8)&0xFF),fo);
+			fputc((end&0xFF),fo);
+			fputc(((end>>8)&0xFF),fo);		
+			for (i=0; i<fsize; i++) {fputc(fgetc(fi),fo);};
+			fputc(0x0C,fo);
+			fputc(0x00,fo);
+			fputc(0x0D,fo);
+			fputc(0x00,fo);		
+			fputc((ini&0xFF),fo);
+			fputc(((ini>>8)&0xFF),fo);	
+			printf("CASINI/DOSINI adress = $%04X\n",ini);
 			fputc(0xE0,fo);
 			fputc(0x02,fo);
 			fputc(0xE1,fo);
@@ -40,11 +52,6 @@ void boot2xex(const char *fni, const char *fno)
 			fputc((start&0xFF),fo);
 			fputc(((start>>8)&0xFF),fo);
 			printf("Run adress = $%04X\n",start);
-			fputc((start&0xFF),fo);
-			fputc(((start>>8)&0xFF),fo);
-			fputc((end&0xFF),fo);
-			fputc(((end>>8)&0xFF),fo);		
-			for (i=0; i<fsize; i++) {fputc(fgetc(fi),fo);};	
 			fclose(fo);
 		}
 		else
