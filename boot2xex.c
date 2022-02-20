@@ -3,7 +3,7 @@
 /*--------------------------------------------------------------------*/
 #include <stdio.h>
 /*--------------------------------------------------------------------*/
-void boot2xex(const char *fni, const char *fno)
+void boot2xex(const char *fni, const char *fno, unsigned char mode)
 {
 	unsigned int i,fsize;
 	unsigned int start, end, ini;
@@ -48,10 +48,19 @@ void boot2xex(const char *fni, const char *fno)
 			fputc(0xE0,fo);
 			fputc(0x02,fo);
 			fputc(0xE1,fo);
-			fputc(0x02,fo);		
+			fputc(0x02,fo);
+			printf("Run adress = $%04X",start);
+			if (mode) 
+			{
+				start=ini;
+				printf(" (corrected)\n");
+			}
+			else 
+			{
+				printf("\n");
+			};
 			fputc((start&0xFF),fo);
-			fputc(((start>>8)&0xFF),fo);
-			printf("Run adress = $%04X\n",start);
+			fputc(((start>>8)&0xFF),fo);		
 			fclose(fo);
 		}
 		else
@@ -73,12 +82,17 @@ int main(int argc, char *argv[])
 	{
 		case 3:
 		{
-			boot2xex(argv[1],argv[2]);
+			boot2xex(argv[1],argv[2],0);
+		} break;
+		case 4:
+		{
+			boot2xex(argv[1],argv[2],1);
 		} break;
 		default:
 		{
 			printf("use:\n");
 			printf("   bootxex file.atariboot file.xex\n");	
+			printf("   bootxex file.atariboot file.xex -r\n");	
 		} break;
 	};
 	return 0;
