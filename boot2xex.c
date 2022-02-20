@@ -43,7 +43,13 @@ void boot2xex(const char *fni, const char *fno, unsigned char mode)
 			fputc(0x0D,fo);
 			fputc(0x00,fo);		
 			fputc((ini&0xFF),fo);
-			fputc(((ini>>8)&0xFF),fo);	
+			fputc(((ini>>8)&0xFF),fo);
+			fputc(0x02,fo);
+			fputc(0x00,fo);
+			fputc(0x03,fo);
+			fputc(0x00,fo);		
+			fputc((ini&0xFF),fo);
+			fputc(((ini>>8)&0xFF),fo);
 			printf("CASINI/DOSINI adress = $%04X\n",ini);
 			fputc(0xE0,fo);
 			fputc(0x02,fo);
